@@ -27,7 +27,6 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{height:100%;background:var(--bg);color:var(--white);font-family:'Sora',sans-serif;overflow:hidden;}
   .app{display:flex;height:100vh;}
-
   .sidebar{
     width:var(--sidebar-w);min-width:var(--sidebar-w);
     background:#111113;
@@ -35,12 +34,14 @@
     display:flex;flex-direction:column;
     transition:width .25s ease,min-width .25s ease;
     overflow:hidden;z-index:100;
+    flex-shrink:0;
   }
   .sidebar.collapsed{width:var(--sidebar-collapsed);min-width:var(--sidebar-collapsed);}
   .sidebar-logo{
     padding:20px 16px 16px;
     display:flex;align-items:center;gap:10px;
     border-bottom:1px solid var(--border);
+    min-height:65px;
   }
   .logo-icon{
     width:32px;height:32px;min-width:32px;
@@ -48,8 +49,10 @@
     border-radius:8px;
     display:flex;align-items:center;justify-content:center;
     font-size:14px;font-weight:800;color:#0d0d0f;
+    flex-shrink:0;
   }
-  .logo-text{font-size:15px;font-weight:700;color:var(--gold);white-space:nowrap;letter-spacing:.5px;transition:opacity .2s;}
+  .logo-text{font-size:15px;font-weight:700;color:var(--gold);white-space:nowrap;letter-spacing:.5px;transition:opacity .2s,width .2s;overflow:hidden;}
+  .sidebar.collapsed .logo-text{opacity:0;width:0;}
   .sidebar-toggle{
     margin-left:auto;cursor:pointer;color:var(--secondary);
     background:none;border:none;font-size:16px;padding:4px;
@@ -60,17 +63,16 @@
   .nav-item{
     display:flex;align-items:center;gap:10px;
     padding:10px 10px;border-radius:8px;cursor:pointer;
-    transition:all .18s;white-space:nowrap;overflow:hidden;
+    transition:all .18s;white-space:nowrap;
     border-left:2px solid transparent;margin-bottom:2px;
     font-size:13px;font-weight:500;color:var(--secondary);
+    overflow:hidden;
   }
   .nav-item:hover{color:var(--white);background:var(--gold-dim);}
   .nav-item.active{color:var(--gold);background:rgba(201,168,76,0.1);border-left-color:var(--gold);}
   .nav-icon{font-size:16px;min-width:20px;text-align:center;flex-shrink:0;}
-  .nav-label{transition:opacity .2s;white-space:nowrap;}
-  .sidebar.collapsed .nav-label{opacity:0;pointer-events:none;width:0;overflow:hidden;}
-  .sidebar.collapsed .logo-text{opacity:0;width:0;overflow:hidden;}
-
+  .nav-label{transition:opacity .2s,width .2s;white-space:nowrap;overflow:hidden;}
+  .sidebar.collapsed .nav-label{opacity:0;width:0;}
   .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
   .topbar{
     height:54px;min-height:54px;
@@ -78,17 +80,40 @@
     border-bottom:1px solid var(--border);
     display:flex;align-items:center;padding:0 24px;gap:16px;
     justify-content:space-between;
+    position:relative;z-index:50;
   }
   .topbar-title{font-size:17px;font-weight:700;color:var(--white);}
   .topbar-right{display:flex;align-items:center;gap:12px;}
+  .account-dropdown-wrap{position:relative;}
   .account-badge{
     background:var(--elevated);border:1px solid var(--border);
     padding:5px 12px;border-radius:6px;font-size:12px;
     font-family:'JetBrains Mono',monospace;color:var(--gold);cursor:pointer;
-    white-space:nowrap;
+    white-space:nowrap;display:flex;align-items:center;gap:6px;
+    user-select:none;transition:border-color .2s;
   }
+  .account-badge:hover{border-color:var(--gold);}
+  .account-badge .caret{font-size:9px;color:var(--secondary);}
+  .account-dropdown{
+    position:absolute;top:calc(100% + 6px);right:0;
+    background:var(--card);border:1px solid var(--border);
+    border-radius:10px;min-width:220px;z-index:200;
+    overflow:hidden;
+    box-shadow:0 8px 32px rgba(0,0,0,0.5);
+    display:none;
+  }
+  .account-dropdown.open{display:block;}
+  .account-dropdown-item{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:11px 14px;cursor:pointer;transition:background .15s;
+    border-bottom:1px solid rgba(255,255,255,0.04);
+    font-size:13px;
+  }
+  .account-dropdown-item:last-child{border-bottom:none;}
+  .account-dropdown-item:hover{background:var(--gold-dim);}
+  .account-dropdown-item.active{color:var(--gold);}
+  .account-dropdown-item .acc-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
   .pages{flex:1;overflow-y:auto;padding:24px;}
-
   .card{
     background:var(--card);border:1px solid var(--border);
     border-radius:12px;padding:20px;
@@ -96,7 +121,6 @@
   }
   .card:hover{box-shadow:0 0 12px rgba(201,168,76,0.08);}
   .card-title{font-size:12px;font-weight:600;color:var(--secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
-
   .hero-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px;}
   .stat-card{
     background:var(--card);border:1px solid var(--border);
@@ -110,11 +134,9 @@
   .stat-value.green{color:var(--green);text-shadow:0 0 20px rgba(46,204,113,0.3);}
   .stat-value.red{color:var(--red);text-shadow:0 0 20px rgba(231,76,60,0.3);}
   .stat-value.gold{color:var(--gold);}
-
   .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
   .three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;}
   @media(max-width:900px){.two-col,.three-col{grid-template-columns:1fr;}}
-
   .data-table{width:100%;border-collapse:collapse;font-size:13px;}
   .data-table th{
     text-align:left;padding:10px 12px;
@@ -125,7 +147,6 @@
   .data-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.04);}
   .data-table tr:hover td{background:var(--gold-dim);}
   .data-table tr:last-child td{border-bottom:none;}
-
   .chip{display:inline-flex;align-items:center;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;}
   .chip.long{background:rgba(46,204,113,0.15);color:var(--green);}
   .chip.short{background:rgba(231,76,60,0.15);color:var(--red);}
@@ -138,7 +159,6 @@
   .chip.bull{background:rgba(46,204,113,0.12);color:var(--green);}
   .chip.bear{background:rgba(231,76,60,0.12);color:var(--red);}
   .chip.neutral{background:rgba(201,168,76,0.12);color:var(--gold);}
-
   .btn{
     display:inline-flex;align-items:center;gap:6px;
     padding:9px 16px;border-radius:8px;border:none;cursor:pointer;
@@ -157,7 +177,6 @@
   .btn-sm{padding:6px 12px;font-size:12px;}
   .btn-green{background:rgba(46,204,113,0.15);color:var(--green);border:1px solid rgba(46,204,113,0.3);}
   .btn-green:hover{background:rgba(46,204,113,0.25);}
-
   .form-group{margin-bottom:16px;}
   .form-label{font-size:12px;color:var(--secondary);font-weight:500;margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.6px;}
   .form-input,.form-select,.form-textarea{
@@ -173,7 +192,6 @@
   .form-row.cols-2{grid-template-columns:1fr 1fr;}
   .form-row.cols-3{grid-template-columns:1fr 1fr 1fr;}
   @media(max-width:700px){.form-row.cols-2,.form-row.cols-3{grid-template-columns:1fr;}}
-
   .modal-overlay{
     position:fixed;inset:0;background:rgba(0,0,0,0.8);
     z-index:500;display:flex;align-items:center;justify-content:center;
@@ -191,7 +209,6 @@
   .modal-title{font-size:18px;font-weight:700;}
   .modal-close{background:none;border:none;color:var(--secondary);font-size:20px;cursor:pointer;transition:color .2s;padding:4px;}
   .modal-close:hover{color:var(--white);}
-
   .toast{
     position:fixed;bottom:24px;right:24px;
     background:var(--elevated);border:1px solid var(--border);
@@ -202,7 +219,6 @@
     pointer-events:none;
   }
   .toast.show{transform:translateY(0);opacity:1;}
-
   .heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
   .heatmap-day{
     border-radius:6px;cursor:pointer;
@@ -221,21 +237,15 @@
   .heatmap-day-trades{font-size:9px;color:var(--secondary);}
   .heatmap-day.pos .heatmap-day-pnl{color:var(--green);}
   .heatmap-day.neg .heatmap-day-pnl{color:var(--red);}
-
   .bar-chart{display:flex;align-items:flex-end;gap:4px;height:80px;}
   .bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
-  .bar{
-    width:100%;border-radius:3px 3px 0 0;transition:height .4s ease;
-    min-height:2px;
-  }
+  .bar{width:100%;border-radius:3px 3px 0 0;transition:height .4s ease;min-height:2px;}
   .bar.pos{background:linear-gradient(0deg,var(--gold-muted),var(--gold));}
   .bar.neg{background:linear-gradient(0deg,#a0302a,var(--red));}
   .bar-label{font-size:9px;color:var(--secondary);font-family:'JetBrains Mono',monospace;}
-
   .stars{display:flex;gap:4px;}
   .star{font-size:18px;cursor:pointer;color:var(--secondary);transition:color .1s;user-select:none;}
   .star.active{color:var(--gold);}
-
   .tabs{display:flex;gap:4px;background:var(--elevated);padding:4px;border-radius:10px;margin-bottom:20px;}
   .tab{
     flex:1;padding:8px 12px;border-radius:7px;border:none;
@@ -243,7 +253,6 @@
     font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;
   }
   .tab.active{background:var(--card);color:var(--gold);box-shadow:0 2px 8px rgba(0,0,0,0.3);}
-
   .toggle{
     position:relative;width:42px;height:24px;
     background:var(--elevated);border:1px solid var(--border);
@@ -256,17 +265,14 @@
     transition:transform .2s,background .2s;
   }
   .toggle.on::after{transform:translateX(18px);background:#0d0d0f;}
-
   .progress-wrap{background:var(--elevated);border-radius:4px;height:6px;overflow:hidden;}
   .progress-bar{height:100%;background:linear-gradient(90deg,var(--gold-muted),var(--gold));border-radius:4px;transition:width .4s ease;}
-
   .mood-grid{display:flex;gap:8px;flex-wrap:wrap;}
   .mood-btn{
     font-size:22px;background:var(--elevated);border:2px solid transparent;
     border-radius:8px;padding:6px 10px;cursor:pointer;transition:all .2s;
   }
   .mood-btn.selected{border-color:var(--gold);background:rgba(201,168,76,0.1);}
-
   .check-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
   .check-item:last-child{border-bottom:none;}
   .check-box{
@@ -278,9 +284,7 @@
   .check-box.checked{background:var(--gold);border-color:var(--gold);color:#0d0d0f;}
   .check-label{font-size:13px;color:var(--secondary);}
   .check-item.done .check-label{color:var(--white);}
-
   .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
-
   .study-card{
     background:var(--card);border:1px solid var(--border);
     border-radius:14px;cursor:pointer;
@@ -302,7 +306,6 @@
   .study-card-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
   .study-card-meta{display:flex;gap:6px;flex-wrap:wrap;}
   .study-card-date{font-size:10px;color:var(--secondary);font-family:'JetBrains Mono',monospace;}
-
   .study-view-modal .modal{width:min(95vw,820px);}
   .study-hero{
     width:100%;height:200px;border-radius:10px;overflow:hidden;
@@ -320,18 +323,11 @@
   .study-rules-list li::before{content:'→';color:var(--gold);font-weight:700;flex-shrink:0;margin-top:1px;}
   .study-yt-embed{width:100%;aspect-ratio:16/9;border-radius:10px;border:1px solid var(--border);background:#000;overflow:hidden;}
   .study-yt-embed iframe{width:100%;height:100%;border:none;}
-  .study-yt-placeholder{
-    width:100%;aspect-ratio:16/9;border-radius:10px;border:1px solid var(--border);
-    background:var(--elevated);display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:8px;cursor:pointer;transition:all .2s;
-  }
-  .study-yt-placeholder:hover{border-color:var(--gold);}
   .study-images-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;}
   .study-img-thumb{border-radius:8px;overflow:hidden;border:1px solid var(--border);aspect-ratio:16/9;cursor:pointer;position:relative;}
   .study-img-thumb img{width:100%;height:100%;object-fit:cover;}
   .study-img-remove{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.75);border:none;color:var(--white);border-radius:4px;padding:2px 6px;font-size:11px;cursor:pointer;opacity:0;transition:opacity .15s;}
   .study-img-thumb:hover .study-img-remove{opacity:1;}
-
   .play-card{
     background:var(--card);border:1px solid var(--border);
     border-radius:12px;padding:18px;cursor:pointer;
@@ -341,7 +337,6 @@
   .play-card-title{font-size:14px;font-weight:700;margin-bottom:6px;}
   .play-card-sub{font-size:12px;color:var(--secondary);margin-bottom:10px;line-height:1.5;}
   .play-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
-
   .slider{
     -webkit-appearance:none;width:100%;height:4px;
     background:linear-gradient(to right,var(--gold) var(--pct,50%),var(--elevated) var(--pct,50%));
@@ -352,21 +347,18 @@
     border-radius:50%;background:var(--gold);cursor:pointer;
     box-shadow:0 0 8px rgba(201,168,76,0.4);
   }
-
   .day-card{
     background:var(--elevated);border:1px solid var(--border);
     border-radius:8px;padding:12px;text-align:center;
   }
   .day-card .day-date{font-size:11px;color:var(--secondary);margin-bottom:4px;}
   .day-card .day-pnl{font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace;}
-
   .badge{
     display:inline-flex;align-items:center;gap:6px;
     background:var(--elevated);border:1px solid var(--border);
     border-radius:8px;padding:10px 14px;font-size:13px;
   }
   .badge.gold{border-color:rgba(201,168,76,0.4);color:var(--gold);}
-
   .search-wrap{position:relative;margin-bottom:16px;}
   .search-input{
     width:100%;background:var(--elevated);border:1px solid var(--border);
@@ -375,10 +367,8 @@
   }
   .search-input:focus{border-color:var(--gold);}
   .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--secondary);font-size:14px;pointer-events:none;}
-
   .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
   .section-title{font-size:16px;font-weight:700;}
-
   .month-group{margin-bottom:20px;}
   .month-header{
     font-size:12px;font-weight:600;color:var(--gold);
@@ -386,7 +376,6 @@
     border-bottom:1px solid var(--border);margin-bottom:10px;
     display:flex;align-items:center;justify-content:space-between;
   }
-
   .journal-card{
     background:var(--elevated);border:1px solid var(--border);
     border-radius:10px;padding:14px;cursor:pointer;
@@ -397,7 +386,6 @@
   .journal-card-date{font-size:13px;font-weight:700;}
   .journal-card-pnl{font-size:14px;font-weight:700;font-family:'JetBrains Mono',monospace;}
   .journal-card-snippet{font-size:12px;color:var(--secondary);line-height:1.5;}
-
   .begin-btn{
     width:100%;padding:16px;border-radius:12px;border:none;cursor:pointer;
     background:linear-gradient(135deg,var(--gold),var(--gold-muted));
@@ -406,65 +394,58 @@
   }
   .begin-btn:hover:not(:disabled){box-shadow:0 0 20px rgba(201,168,76,0.35);}
   .begin-btn:disabled{opacity:0.6;cursor:not-allowed;}
-
   .streak-badge{
     display:inline-flex;align-items:center;gap:6px;
     background:linear-gradient(135deg,rgba(201,168,76,0.1),rgba(201,168,76,0.05));
     border:1px solid rgba(201,168,76,0.3);border-radius:8px;padding:6px 12px;
     font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--gold);
   }
-
   hr.sep{border:none;border-top:1px solid var(--border);margin:20px 0;}
-
   .acc-list{display:flex;flex-direction:column;gap:8px;}
   .acc-item{
-    display:flex;align-items:center;justify-content:space-between;
     background:var(--elevated);border:1px solid var(--border);
-    border-radius:8px;padding:12px;
+    border-radius:10px;padding:14px;
+    transition:border-color .2s;
+  }
+  .acc-item.active-acc{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.04);}
+  .acc-item-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .acc-item-name{font-size:14px;font-weight:700;}
+  .acc-item-meta{display:flex;gap:10px;flex-wrap:wrap;}
+  .acc-meta-pill{
+    font-size:11px;font-family:'JetBrains Mono',monospace;
+    background:var(--card);border:1px solid var(--border);
+    border-radius:4px;padding:3px 8px;color:var(--secondary);
   }
   .acc-active-dot{width:8px;height:8px;border-radius:50%;background:var(--green);}
-
   .pm-section{background:var(--elevated);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:8px;}
   .pm-section-title{font-size:14px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
-
   ::-webkit-scrollbar{width:5px;}
   ::-webkit-scrollbar-track{background:transparent;}
   ::-webkit-scrollbar-thumb{background:rgba(201,168,76,0.2);border-radius:3px;}
   ::-webkit-scrollbar-thumb:hover{background:rgba(201,168,76,0.4);}
-
   .empty{text-align:center;color:var(--secondary);padding:40px;font-size:13px;}
   .empty-icon{font-size:36px;margin-bottom:10px;}
-
   .tag{
     display:inline-flex;padding:3px 8px;border-radius:4px;
     background:rgba(201,168,76,0.1);color:var(--gold);
     font-size:11px;font-weight:500;border:1px solid rgba(201,168,76,0.2);
   }
-
   .page{display:none;}
   .page.active{display:block;}
-
   .goal-card{background:var(--elevated);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
   .goal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
   .goal-name{font-size:14px;font-weight:600;}
   .goal-val{font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--gold);}
   .goal-completed{border-color:rgba(46,204,113,0.3);background:rgba(46,204,113,0.04);}
-
   .mastered-badge{background:rgba(46,204,113,0.1);color:var(--green);border:1px solid rgba(46,204,113,0.2);padding:3px 8px;border-radius:4px;font-size:11px;}
-
   svg.ring{transform:rotate(-90deg);}
   .ring-value{font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--gold);}
-
   .milestone{background:var(--elevated);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
-
   @keyframes countUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
   .stat-value{animation:countUp .4s ease both;}
   @keyframes pulse{0%,100%{opacity:.5;}50%{opacity:1;}}
   .skeleton{background:var(--elevated);border-radius:4px;animation:pulse 1.5s infinite;}
-
-  .nav-controls{
-    display:flex;align-items:center;gap:8px;
-  }
+  .nav-controls{display:flex;align-items:center;gap:8px;}
   .nav-btn{
     background:var(--elevated);border:1px solid var(--border);
     border-radius:6px;color:var(--secondary);cursor:pointer;
@@ -474,7 +455,6 @@
   .nav-btn:hover{border-color:var(--gold);color:var(--gold);}
   .nav-btn:disabled{opacity:0.3;cursor:not-allowed;}
   .nav-period{font-size:13px;font-weight:600;color:var(--white);min-width:120px;text-align:center;}
-
   .pm-date-nav{
     display:flex;align-items:center;justify-content:space-between;
     background:var(--elevated);border:1px solid var(--border);
@@ -483,13 +463,11 @@
   .pm-date-label{font-size:15px;font-weight:700;}
   .pm-date-label.past{color:var(--secondary);}
   .pm-date-label.today{color:var(--gold);}
-
   .pm-readonly-banner{
     background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);
     border-radius:8px;padding:10px 14px;margin-bottom:12px;
     font-size:13px;color:var(--gold);display:flex;align-items:center;gap:8px;
   }
-
   .checklist-section{
     background:var(--elevated);border:1px solid var(--border);
     border-radius:10px;padding:16px;margin-bottom:12px;
@@ -498,7 +476,6 @@
     font-size:13px;font-weight:700;color:var(--white);
     margin-bottom:10px;display:flex;align-items:center;gap:8px;
   }
-
   .image-upload-area{
     border:2px dashed var(--border);border-radius:8px;
     padding:24px;text-align:center;cursor:pointer;
@@ -506,7 +483,6 @@
   }
   .image-upload-area:hover{border-color:var(--gold);background:rgba(201,168,76,0.05);}
   .image-upload-area.dragover{border-color:var(--gold);background:rgba(201,168,76,0.1);}
-
   .trade-image-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:8px;}
   .trade-image-thumb{
     position:relative;border-radius:6px;overflow:hidden;
@@ -520,7 +496,6 @@
     opacity:0;transition:opacity .15s;
   }
   .trade-image-thumb:hover .img-remove{opacity:1;}
-
   .sort-select{
     background:var(--elevated);border:1px solid var(--border);
     border-radius:6px;color:var(--white);font-family:'Sora',sans-serif;
@@ -529,10 +504,8 @@
   }
   .sort-select:focus{border-color:var(--gold);}
   .sort-select option{background:#1f1f22;}
-
   .week-row-nav{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
   .week-row-label{font-size:12px;color:var(--secondary);font-weight:500;}
-
   .dash-goals-strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;}
   .dash-goal-mini{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;}
   .dash-goal-mini-title{font-size:11px;font-weight:600;color:var(--secondary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;}
@@ -544,7 +517,12 @@
   .goal-prev-header{font-size:12px;font-weight:600;color:var(--secondary);text-transform:uppercase;letter-spacing:.8px;padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:10px;}
   .goal-prev-item{background:var(--elevated);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:6px;opacity:0.6;}
   .goal-prev-item .goal-top{margin-bottom:4px;}
-
+  .settings-section-label{
+    font-size:11px;font-weight:700;color:var(--gold);
+    text-transform:uppercase;letter-spacing:1.2px;
+    padding:8px 0 6px;margin-bottom:8px;
+    border-bottom:1px solid var(--border);
+  }
   @media(max-width:768px){
     .sidebar{position:absolute;height:100vh;}
     .two-col,.three-col{grid-template-columns:1fr;}
@@ -555,12 +533,11 @@
 </head>
 <body>
 <div class="app">
-
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <div class="logo-icon">TV</div>
       <span class="logo-text">TradeVault</span>
-      <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+      <button class="sidebar-toggle" id="sidebar-toggle-btn" onclick="toggleSidebar()">☰</button>
     </div>
     <div class="sidebar-nav">
       <div class="nav-item active" onclick="navigate('dashboard',this)"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span></div>
@@ -573,19 +550,21 @@
       <div class="nav-item" onclick="navigate('settings',this)"><span class="nav-icon">⚙️</span><span class="nav-label">Settings</span></div>
     </div>
   </nav>
-
   <div class="main">
     <div class="topbar">
       <div class="topbar-title" id="topbar-title">Dashboard</div>
       <div class="topbar-right">
-        <div class="account-badge" id="account-badge" onclick="navigate('settings',document.querySelector('[onclick*=settings]'))">Loading...</div>
+        <div class="account-dropdown-wrap" id="account-dropdown-wrap">
+          <div class="account-badge" id="account-badge" onclick="toggleAccountDropdown()">
+            <span id="account-badge-text">Loading...</span>
+            <span class="caret">▼</span>
+          </div>
+          <div class="account-dropdown" id="account-dropdown"></div>
+        </div>
         <div style="font-size:12px;color:var(--secondary)" id="topbar-date"></div>
       </div>
     </div>
-
     <div class="pages">
-
-      <!-- DASHBOARD -->
       <div class="page active" id="page-dashboard">
         <div class="hero-grid" id="hero-stats"></div>
         <div class="two-col">
@@ -649,8 +628,6 @@
           </table>
         </div>
       </div>
-
-      <!-- PRE-MARKET -->
       <div class="page" id="page-premarket">
         <div class="pm-date-nav">
           <button class="nav-btn" onclick="shiftPmDate(-1)">‹ Prev Day</button>
@@ -722,8 +699,6 @@
           <button class="begin-btn" id="begin-day-btn" onclick="beginTradingDay()">🚀 Begin Trading Day</button>
         </div>
       </div>
-
-      <!-- JOURNAL -->
       <div class="page" id="page-journal">
         <div class="two-col" style="align-items:start">
           <div>
@@ -752,8 +727,6 @@
           </div>
         </div>
       </div>
-
-      <!-- REFLECTIVE -->
       <div class="page" id="page-reflective">
         <div class="section-header">
           <div class="section-title">Reflective Journal</div>
@@ -775,8 +748,6 @@
           <div id="milestones-list" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;"></div>
         </div>
       </div>
-
-      <!-- STUDY -->
       <div class="page" id="page-study">
         <div class="section-header">
           <div class="section-title">Study Library</div>
@@ -789,8 +760,6 @@
         <div id="study-filter-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;"></div>
         <div class="card-grid" id="study-cards"></div>
       </div>
-
-      <!-- PLAYBOOK -->
       <div class="page" id="page-playbook">
         <div class="section-header">
           <div class="section-title">My Playbook</div>
@@ -799,8 +768,6 @@
         <div id="playbook-stats-row" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px"></div>
         <div class="card-grid" id="playbook-cards"></div>
       </div>
-
-      <!-- GOALS -->
       <div class="page" id="page-goals">
         <div class="tabs" id="goals-tabs">
           <button class="tab active" onclick="switchGoalTab('daily',this)">Daily</button>
@@ -816,8 +783,6 @@
         <div id="goals-prev-section"></div>
         <div id="goals-accountability"></div>
       </div>
-
-      <!-- SETTINGS -->
       <div class="page" id="page-settings">
         <div class="two-col" style="align-items:start">
           <div>
@@ -827,57 +792,24 @@
                 <label class="form-label">Name</label>
                 <input type="text" class="form-input" id="s-name" placeholder="Your name" oninput="saveSettings()">
               </div>
-              <div class="form-group" style="margin-bottom:0">
+              <div class="form-group">
                 <label class="form-label">Trading Alias</label>
                 <input type="text" class="form-input" id="s-alias" placeholder="e.g. goldtrader" oninput="saveSettings()">
               </div>
-            </div>
-            <div class="card" style="margin-bottom:16px">
-              <div class="card-title">Risk Settings</div>
-              <div class="form-row cols-2">
-                <div class="form-group">
-                  <label class="form-label">Risk Per Trade %</label>
-                  <input type="number" class="form-input" id="s-risk" placeholder="1" oninput="saveSettings()">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Daily Max Loss $</label>
-                  <input type="number" class="form-input" id="s-maxloss" placeholder="250" oninput="saveSettings()">
-                </div>
-              </div>
               <div class="form-group" style="margin-bottom:0">
-                <label class="form-label">Max Trades Per Day</label>
-                <input type="number" class="form-input" id="s-maxtrades" placeholder="3" oninput="saveSettings()">
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-title">Instruments</div>
-              <div id="instruments-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px"></div>
-              <div style="display:flex;gap:8px">
-                <input type="text" class="form-input" id="new-instrument" placeholder="Add symbol e.g. XAUUSD" style="flex:1">
-                <button class="btn btn-gold btn-sm" onclick="addInstrument()">Add</button>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="card" style="margin-bottom:16px">
-              <div class="card-title">Accounts</div>
-              <div class="acc-list" id="accounts-list"></div>
-              <button class="btn btn-outline btn-sm" style="margin-top:12px" onclick="openAccountModal()">+ Add Account</button>
-            </div>
-            <div class="card" style="margin-bottom:16px">
-              <div class="card-title">Mental Checklist Items</div>
-              <div id="checklist-items-mgr"></div>
-              <div style="display:flex;gap:8px;margin-top:10px">
-                <input type="text" class="form-input" id="new-checklist-item" placeholder="Add checklist item" style="flex:1">
-                <button class="btn btn-gold btn-sm" onclick="addChecklistItem()">Add</button>
-              </div>
-            </div>
-            <div class="card" style="margin-bottom:16px">
-              <div class="card-title">Pre-Market Task Items</div>
-              <div id="pm-tasks-mgr"></div>
-              <div style="display:flex;gap:8px;margin-top:10px">
-                <input type="text" class="form-input" id="new-pm-task" placeholder="Add pre-market task" style="flex:1">
-                <button class="btn btn-gold btn-sm" onclick="addPmTaskItem()">Add</button>
+                <label class="form-label">Timezone</label>
+                <select class="form-select" id="s-timezone" onchange="saveSettings();updateTopbarDate()">
+                  <option value="America/Los_Angeles">PST — Pacific (Los Angeles)</option>
+                  <option value="America/Denver">MST — Mountain (Denver)</option>
+                  <option value="America/Chicago">CST — Central (Chicago)</option>
+                  <option value="America/New_York">EST — Eastern (New York)</option>
+                  <option value="Europe/London">GMT — London</option>
+                  <option value="Europe/Paris">CET — Paris / Berlin</option>
+                  <option value="Asia/Tokyo">JST — Tokyo</option>
+                  <option value="Asia/Singapore">SGT — Singapore</option>
+                  <option value="Australia/Sydney">AEST — Sydney</option>
+                  <option value="UTC">UTC</option>
+                </select>
               </div>
             </div>
             <div class="card">
@@ -892,16 +824,19 @@
               </div>
             </div>
           </div>
+          <div>
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-title">Accounts</div>
+              <div class="acc-list" id="accounts-list"></div>
+              <button class="btn btn-outline btn-sm" style="margin-top:12px" onclick="openAccountModal()">+ Add Account</button>
+            </div>
+          </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
-
 <div class="toast" id="toast">✓ Saved</div>
-
-<!-- JOURNAL MODAL -->
 <div class="modal-overlay" id="journal-modal">
   <div class="modal" style="width:min(95vw,860px)">
     <div class="modal-header">
@@ -911,8 +846,6 @@
     <div id="journal-modal-body"></div>
   </div>
 </div>
-
-<!-- IMAGE LIGHTBOX -->
 <div class="modal-overlay" id="lightbox-modal">
   <div class="modal" style="width:min(95vw,900px);padding:12px;background:#0d0d0f">
     <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
@@ -921,10 +854,8 @@
     <img id="lightbox-img" src="" style="width:100%;border-radius:8px;max-height:80vh;object-fit:contain">
   </div>
 </div>
-
-<!-- STUDY VIEW MODAL -->
 <div class="modal-overlay study-view-modal" id="study-view-modal">
-  <div class="modal" style="width:min(95vw,820px)">
+  <div class="modal" style="width:min(95vw,860px)">
     <div class="modal-header">
       <div class="modal-title" id="study-view-title">Lesson</div>
       <div style="display:flex;gap:8px;align-items:center">
@@ -935,10 +866,8 @@
     <div id="study-view-body"></div>
   </div>
 </div>
-
-<!-- STUDY EDIT MODAL -->
 <div class="modal-overlay" id="study-edit-modal">
-  <div class="modal" style="width:min(95vw,760px)">
+  <div class="modal" style="width:min(95vw,800px)">
     <div class="modal-header">
       <div class="modal-title" id="study-edit-modal-title">Add Lesson</div>
       <button class="modal-close" onclick="closeModal('study-edit-modal')">✕</button>
@@ -946,8 +875,6 @@
     <div id="study-edit-modal-body"></div>
   </div>
 </div>
-
-<!-- PLAYBOOK MODAL -->
 <div class="modal-overlay" id="playbook-modal">
   <div class="modal">
     <div class="modal-header">
@@ -957,8 +884,6 @@
     <div id="pb-modal-body"></div>
   </div>
 </div>
-
-<!-- GOAL MODAL -->
 <div class="modal-overlay" id="goal-modal">
   <div class="modal" style="width:min(90vw,480px)">
     <div class="modal-header">
@@ -968,8 +893,6 @@
     <div id="goal-modal-body"></div>
   </div>
 </div>
-
-<!-- ACCOUNT MODAL -->
 <div class="modal-overlay" id="account-modal">
   <div class="modal" style="width:min(90vw,440px)">
     <div class="modal-header">
@@ -979,8 +902,6 @@
     <div id="account-modal-body"></div>
   </div>
 </div>
-
-<!-- DAY DETAIL MODAL -->
 <div class="modal-overlay" id="day-modal">
   <div class="modal" style="width:min(90vw,500px)">
     <div class="modal-header">
@@ -990,46 +911,36 @@
     <div id="day-modal-body"></div>
   </div>
 </div>
-
 <script>
-const KEYS = {
-  trades:'tv_trades', journal:'tv_journal', goals:'tv_goals',
-  playbook:'tv_playbook', study:'tv_study', premarket:'tv_premarket',
-  settings:'tv_settings', accounts:'tv_accounts'
+const KEYS={
+  trades:'tv_trades',journal:'tv_journal',goals:'tv_goals',
+  playbook:'tv_playbook',study:'tv_study',premarket:'tv_premarket',
+  settings:'tv_settings',accounts:'tv_accounts'
 };
-
-function load(key){
-  try{return JSON.parse(localStorage.getItem(key)||'null');}
-  catch{return null;}
-}
-function save(key,val){
-  try{localStorage.setItem(key,JSON.stringify(val));return true;}
-  catch{return false;}
-}
-
+function load(key){try{return JSON.parse(localStorage.getItem(key)||'null');}catch{return null;}}
+function save(key,val){try{localStorage.setItem(key,JSON.stringify(val));return true;}catch{return false;}}
 function getSettings(){
   const defaults={
-    name:'Trader',alias:'',risk:1,maxloss:250,maxtrades:3,
+    name:'Trader',alias:'',
     instruments:['XAUUSD','EURUSD','NQ','MNQ','MGC'],
     checklist:['Slept well','Not emotional','Plan is clear','Risk limits set','No revenge trading mindset'],
     pmTasks:['Mark HTF levels on chart','Check economic calendar','Identify today\'s key liquidity','Review yesterday\'s trades','Set alerts on key levels','Check correlation pairs','Review pre-market gaps'],
-    activeAccount:0
+    activeAccount:0,
+    timezone:'America/Los_Angeles'
   };
   const stored=load(KEYS.settings);
   return stored?Object.assign({},defaults,stored):defaults;
 }
-
 function getAccounts(){
   return load(KEYS.accounts)||[
     {name:'Lucid 25K Flex',balance:25000,broker:'Lucid Trading',type:'Funded'},
     {name:'Lucid 25K Pro',balance:25000,broker:'Lucid Trading',type:'Evaluation'}
   ];
 }
-
 function getJournal(){return load(KEYS.journal)||[];}
 function getGoals(){return load(KEYS.goals)||[];}
 function getPlaybook(){return load(KEYS.playbook)||[];}
-function getStudy(){return load(KEYS.study)||defaultStudy();}
+function getStudy(){return load(KEYS.study)||[];}
 function getPremarket(date){
   const all=load(KEYS.premarket)||{};
   return all[date]||{assets:[],news:[],intention:'',checklist:{},pmTasks:{},maxloss:'',started:false,startTime:''};
@@ -1038,68 +949,15 @@ function savePremarket(date,data){
   const all=load(KEYS.premarket)||{};
   all[date]=data;save(KEYS.premarket,all);
 }
-
-function defaultStudy(){
-  const now=new Date().toISOString().split('T')[0];
-  return [
-    {id:'s1',title:'Fair Value Gap (FVG)',category:'ICT',difficulty:'beginner',
-     desc:'An imbalance in price delivery between 3 candles. Price tends to return to fill these gaps. This is one of the most used ICT concepts and shows up on every timeframe.',
-     rules:'1. Identify 3-candle sequence\n2. Gap between candle 1 high and candle 3 low (bullish)\n3. Wait for price to return and react\n4. Confirm with higher timeframe direction',
-     notes:'',link:'',youtubeUrl:'',images:[],mastered:false,dateAdded:now,keyPoints:'Works on all timeframes\nLook for displacement before the FVG\nBullish FVG = gap between candle 1 high and candle 3 low',coverEmoji:'📊'},
-    {id:'s2',title:'Order Blocks',category:'ICT',difficulty:'intermediate',
-     desc:'The last up/down candle before a significant move. Smart money accumulation zones where institutional orders sit.',
-     rules:'1. Find last bullish candle before bearish impulse\n2. Mark high and low\n3. Wait for price to return\n4. Enter on reaction with confirmation',
-     notes:'',link:'',youtubeUrl:'',images:[],mastered:false,dateAdded:now,keyPoints:'Last candle before the big move\nBodies matter more than wicks\nHigher timeframe OBs are stronger',coverEmoji:'🧱'},
-    {id:'s3',title:'Displacement Candles',category:'SMC',difficulty:'beginner',
-     desc:'Large impulsive candles that indicate smart money involvement and intent. These show who is really in control of price.',
-     rules:'1. Large body, small wicks\n2. Breaks structure\n3. Closes away from origin',
-     notes:'',link:'',youtubeUrl:'',images:[],mastered:false,dateAdded:now,keyPoints:'Big body = big intent\nShould close near its high or low\nOften leaves an FVG behind',coverEmoji:'⚡'},
-    {id:'s4',title:'Liquidity Sweeps',category:'ICT',difficulty:'intermediate',
-     desc:'Price runs above old highs or below old lows to grab stop orders before reversing. This is how the market hunts retail traders.',
-     rules:'1. Identify swing highs/lows with cluster of stops\n2. Watch for sweep + rejection\n3. Entry on displacement after sweep',
-     notes:'',link:'',youtubeUrl:'',images:[],mastered:false,dateAdded:now,keyPoints:'Sweeps old highs and lows\nRetail stops = institutional fuel\nLook for wick + fast reversal',coverEmoji:'🎯'},
-    {id:'s5',title:'Kill Zones',category:'ICT',difficulty:'beginner',
-     desc:'High probability trading sessions where institutions are most active. London Open and NY Open are the best times to trade.',
-     rules:'1. London: 2-5am EST\n2. NY Open: 8-11am EST\n3. Avoid trading outside these windows\n4. NY Close 3-4pm EST also valid',
-     notes:'',link:'',youtubeUrl:'',images:[],mastered:false,dateAdded:now,keyPoints:'London 2-5am EST\nNY Open 8-11am EST\nAvoid Asian session for major moves',coverEmoji:'⏰'},
-    {id:'s6',title:'Premium / Discount Zones',category:'ICT',difficulty:'beginner',
-     desc:'Using the 50% equilibrium of a range to identify if price is cheap (discount) or expensive (premium). Buy cheap, sell expensive.',
-     rules:'1. Mark swing high and low\n2. Draw 50% level (equilibrium)\n3. Buy in discount, sell in premium\n4. Combine with other confluences',
-     notes:'',link:'',youtubeUrl:'',images:[],mastered:false,dateAdded:now,keyPoints:'Above 50% = premium (expensive)\nBelow 50% = discount (cheap)\nAlways trade from the right side',coverEmoji:'📐'},
-  ];
+function getNow(){
+  const s=getSettings();
+  const tz=s.timezone||'America/Los_Angeles';
+  return new Date(new Date().toLocaleString('en-US',{timeZone:tz}));
 }
-
-let currentPage='dashboard';
-let currentGoalTab='daily';
-
-function navigate(page, el){
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  if(el) el.classList.add('active');
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
-  const titles={dashboard:'Dashboard',premarket:'Pre-Market',journal:'Journal',reflective:'Reflective',
-    study:'Study',playbook:'Playbook',goals:'Goals',settings:'Settings'};
-  document.getElementById('topbar-title').textContent=titles[page]||page;
-  currentPage=page;
-  renderPage(page);
+function today(){
+  const n=getNow();
+  return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
 }
-
-function renderPage(page){
-  if(page==='dashboard') renderDashboard();
-  else if(page==='premarket') renderPremarket();
-  else if(page==='journal') renderJournalList();
-  else if(page==='reflective') renderReflective();
-  else if(page==='study') renderStudyCards();
-  else if(page==='playbook') renderPlaybook();
-  else if(page==='goals') renderGoals();
-  else if(page==='settings') renderSettings();
-}
-
-function toggleSidebar(){
-  document.getElementById('sidebar').classList.toggle('collapsed');
-}
-
-function today(){return new Date().toISOString().split('T')[0];}
 function fmtDate(d){
   const dt=new Date(d+'T00:00:00');
   return dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
@@ -1114,72 +972,74 @@ function getDOW(d){
 function getMonthDays(year,month){
   const dim=new Date(year,month+1,0).getDate();
   const days=[];
-  for(let i=1;i<=dim;i++){
-    days.push(`${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`);
-  }
+  for(let i=1;i<=dim;i++) days.push(`${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`);
   return days;
 }
 function thisMonthDays(){
-  const now=new Date();
-  return getMonthDays(now.getFullYear(),now.getMonth());
+  const n=getNow();
+  return getMonthDays(n.getFullYear(),n.getMonth());
 }
 function getWeekDays(offsetWeeks){
   const out=[];
-  const now=new Date();
-  now.setDate(now.getDate() + offsetWeeks*7);
+  const now=getNow();
+  now.setDate(now.getDate()+offsetWeeks*7);
   const dow=now.getDay();
   const monday=new Date(now);
   monday.setDate(now.getDate()-dow+1);
   for(let i=0;i<7;i++){
     const d=new Date(monday);
     d.setDate(monday.getDate()+i);
-    out.push(d.toISOString().split('T')[0]);
+    out.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`);
   }
   return out;
 }
-
 let heatmapMonthOffset=0;
 let barMonthOffset=0;
 let weekOffset=0;
-
 function shiftHeatmapMonth(dir){
   heatmapMonthOffset+=dir;
-  const now=new Date();
+  const now=getNow();
   const target=new Date(now.getFullYear(),now.getMonth()+heatmapMonthOffset,1);
-  if(target>now && dir>0){heatmapMonthOffset--;return;}
+  if(target>now&&dir>0){heatmapMonthOffset--;return;}
   renderHeatmap();
   renderBarChart();
   const nextTarget=new Date(now.getFullYear(),now.getMonth()+heatmapMonthOffset+1,1);
   document.getElementById('heatmap-next-btn').disabled=nextTarget>now;
 }
-
 function shiftBarMonth(dir){
   barMonthOffset+=dir;
-  const now=new Date();
+  const now=getNow();
   const target=new Date(now.getFullYear(),now.getMonth()+barMonthOffset,1);
-  if(target>now && dir>0){barMonthOffset--;return;}
+  if(target>now&&dir>0){barMonthOffset--;return;}
   renderBarChart();
   const nextTarget=new Date(now.getFullYear(),now.getMonth()+barMonthOffset+1,1);
   document.getElementById('bar-next-btn').disabled=nextTarget>now;
 }
-
 function shiftWeek(dir){
   weekOffset+=dir;
-  const now=new Date();
-  const target=new Date(now);
-  target.setDate(now.getDate()+weekOffset*7);
-  if(target>now && dir>0){weekOffset--;return;}
+  if(weekOffset>0){weekOffset=0;return;}
   renderWeekRow();
   document.getElementById('week-next-btn').disabled=(weekOffset>=0);
 }
-
-function calcStats(){
+function getActiveAccountJournal(){
+  const s=getSettings();
+  const accounts=getAccounts();
+  const idx=s.activeAccount||0;
+  if(idx===-1) return getJournal();
   const journal=getJournal();
+  const acct=accounts[idx];
+  if(!acct) return journal;
+  return journal.filter(e=>{
+    if(!e.accountId&&idx===0) return true;
+    return e.accountId===acct.name;
+  });
+}
+function calcStats(journalOverride){
+  const journal=journalOverride||getActiveAccountJournal();
   let totalPnl=0,todayPnl=0,wins=0,losses=0;
   const tradeDays=new Set();
   const t=today();
   const dayPnl={};
-
   journal.forEach(e=>{
     const net=parseFloat(e.net_pnl||0);
     totalPnl+=net;
@@ -1192,10 +1052,8 @@ function calcStats(){
     tradeDays.add(e.date);
     dayPnl[e.date]=(dayPnl[e.date]||0)+net;
   });
-
   const total=wins+losses;
   const winRate=total>0?Math.round(wins/total*100):0;
-
   let streak=0,lastGreen=null;
   const sortedDays=Object.keys(dayPnl).sort().reverse();
   for(let i=0;i<sortedDays.length;i++){
@@ -1204,7 +1062,6 @@ function calcStats(){
     else if((pnl>=0)===lastGreen) streak++;
     else break;
   }
-
   let grossWins=0,grossLoss=0;
   journal.forEach(e=>{
     (e.trades||[]).forEach(t=>{
@@ -1214,10 +1071,8 @@ function calcStats(){
   });
   const profitFactor=grossLoss>0?(grossWins/grossLoss):0;
   const consistency=calcConsistency(dayPnl);
-
   return{totalPnl,todayPnl,winRate,wins,losses,total,tradeDays:tradeDays.size,streak,lastGreen,profitFactor,consistency,dayPnl};
 }
-
 function calcConsistency(dayPnl){
   const vals=Object.values(dayPnl);
   if(!vals.length) return 0;
@@ -1228,7 +1083,6 @@ function calcConsistency(dayPnl){
   const cv=Math.abs(mean/std);
   return Math.min(100,Math.round(greenPct*60+Math.min(40,cv*40)));
 }
-
 function renderDashboard(){
   const s=calcStats();
   const heroEl=document.getElementById('hero-stats');
@@ -1273,8 +1127,7 @@ function renderDashboard(){
       </svg>
     </div>
   `;
-
-  const todayEntries=getJournal().filter(e=>e.date===today());
+  const todayEntries=getActiveAccountJournal().filter(e=>e.date===today());
   const ttEl=document.getElementById('today-trades-list');
   const todayTrades=todayEntries.flatMap(e=>e.trades||[]);
   if(!todayTrades.length){
@@ -1296,14 +1149,12 @@ function renderDashboard(){
     rows+='</tbody></table>';
     ttEl.innerHTML=rows;
   }
-
   renderWeekRow();
   renderDashGoals();
   renderHeatmap();
   renderBarChart();
   renderRecentPerf();
 }
-
 function renderDashGoals(){
   const goals=getGoals();
   const tabs=['daily','weekly','monthly'];
@@ -1327,14 +1178,12 @@ function renderDashGoals(){
     </div>`;
   }).join('');
 }
-
 function renderWeekRow(){
   const days=getWeekDays(weekOffset);
-  const journal=getJournal();
+  const journal=getActiveAccountJournal();
   const label=weekOffset===0?'This Week':`Week of ${fmtShort(days[0])}`;
   document.getElementById('week-period-label').textContent=label;
   document.getElementById('week-next-btn').disabled=(weekOffset>=0);
-
   document.getElementById('last7-row').innerHTML=days.map(d=>{
     const entries=journal.filter(e=>e.date===d);
     const pnl=entries.reduce((a,e)=>a+parseFloat(e.net_pnl||0),0);
@@ -1347,18 +1196,15 @@ function renderWeekRow(){
     </div>`;
   }).join('');
 }
-
 function renderHeatmap(){
-  const now=new Date();
-  const targetYear=now.getFullYear();
-  const targetMonth=now.getMonth()+heatmapMonthOffset;
-  const dt=new Date(targetYear,targetMonth,1);
+  const now=getNow();
+  const dt=new Date(now.getFullYear(),now.getMonth()+heatmapMonthOffset,1);
   const year=dt.getFullYear();
   const month=dt.getMonth();
   const days=getMonthDays(year,month);
   const label=dt.toLocaleDateString('en-US',{month:'long',year:'numeric'});
   document.getElementById('heatmap-month-nav-label').textContent=label;
-  const journal=getJournal();
+  const journal=getActiveAccountJournal();
   const firstDay=new Date(days[0]+'T00:00:00').getDay();
   let html='';
   for(let i=0;i<firstDay;i++) html+='<div></div>';
@@ -1376,22 +1222,18 @@ function renderHeatmap(){
     </div>`;
   });
   document.getElementById('monthly-heatmap').innerHTML=html;
-
   const nextMonthDt=new Date(year,month+1,1);
   document.getElementById('heatmap-next-btn').disabled=nextMonthDt>now;
 }
-
 function renderBarChart(){
-  const now=new Date();
-  const targetYear=now.getFullYear();
-  const targetMonth=now.getMonth()+barMonthOffset;
-  const dt=new Date(targetYear,targetMonth,1);
+  const now=getNow();
+  const dt=new Date(now.getFullYear(),now.getMonth()+barMonthOffset,1);
   const year=dt.getFullYear();
   const month=dt.getMonth();
   const days=getMonthDays(year,month);
   const label=dt.toLocaleDateString('en-US',{month:'short',year:'numeric'});
   document.getElementById('bar-month-nav-label').textContent=label;
-  const journal=getJournal();
+  const journal=getActiveAccountJournal();
   const vals=days.map(d=>journal.filter(e=>e.date===d).reduce((a,e)=>a+parseFloat(e.net_pnl||0),0));
   const maxAbs=Math.max(...vals.map(Math.abs),1);
   document.getElementById('monthly-bar-chart').innerHTML=vals.map((v,i)=>{
@@ -1401,13 +1243,11 @@ function renderBarChart(){
       <div class="bar-label">${new Date(days[i]+'T00:00:00').getDate()}</div>
     </div>`;
   }).join('');
-
   const nextMonthDt=new Date(year,month+1,1);
   document.getElementById('bar-next-btn').disabled=nextMonthDt>now;
 }
-
 function renderRecentPerf(){
-  const journal=getJournal();
+  const journal=getActiveAccountJournal();
   const byDay={};
   journal.forEach(e=>{
     if(!byDay[e.date]) byDay[e.date]={date:e.date,count:0,gross:0,net:0,wins:0,total:0,notes:''};
@@ -1439,24 +1279,20 @@ function renderRecentPerf(){
     </tr>`;
   }).join('');
 }
-
 let pmData=null;
 let pmDate='';
 let pmDateOffset=0;
-
 function getPmDateByOffset(offset){
-  const d=new Date();
+  const d=getNow();
   d.setDate(d.getDate()+offset);
-  return d.toISOString().split('T')[0];
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
-
 function shiftPmDate(dir){
   pmDateOffset+=dir;
   if(pmDateOffset>0) pmDateOffset=0;
   renderPremarket();
   document.getElementById('pm-next-btn').disabled=(pmDateOffset>=0);
 }
-
 function addPmGoal(){
   const name=document.getElementById('pm-goal-name').value.trim();
   if(!name){showToast('Enter a goal name first');return;}
@@ -1464,16 +1300,8 @@ function addPmGoal(){
   const unit=document.getElementById('pm-goal-unit').value.trim()||'';
   const goals=getGoals();
   goals.push({
-    id:'g'+Date.now(),
-    tab:'daily',
-    name,
-    target,
-    unit,
-    deadline:today(),
-    notes:'Added from pre-market',
-    current:0,
-    completed:false,
-    completedDate:null
+    id:'g'+Date.now(),tab:'daily',name,target,unit,
+    deadline:today(),notes:'Added from pre-market',current:0,completed:false,completedDate:null
   });
   save(KEYS.goals,goals);
   document.getElementById('pm-goal-name').value='';
@@ -1481,16 +1309,13 @@ function addPmGoal(){
   document.getElementById('pm-goal-unit').value='';
   showToast('Goal added to Daily Goals!');
 }
-
 function renderPremarket(){
   pmDate=getPmDateByOffset(pmDateOffset);
   pmData=getPremarket(pmDate);
   const settings=getSettings();
   const isToday=(pmDateOffset===0);
   const isPast=(pmDateOffset<0);
-
   document.getElementById('pm-next-btn').disabled=(pmDateOffset>=0);
-
   const labelEl=document.getElementById('pm-date-label');
   const subEl=document.getElementById('pm-date-sub');
   if(isToday){
@@ -1502,10 +1327,7 @@ function renderPremarket(){
     labelEl.className='pm-date-label past';
     subEl.textContent='Past session';
   }
-
-  const readonlyNotice=document.getElementById('pm-readonly-notice');
-  readonlyNotice.style.display=isPast?'flex':'none';
-
+  document.getElementById('pm-readonly-notice').style.display=isPast?'flex':'none';
   const banner=document.getElementById('premarket-started-banner');
   const btn=document.getElementById('begin-day-btn');
   if(pmData.started){
@@ -1518,14 +1340,12 @@ function renderPremarket(){
     btn.disabled=isPast;
     btn.textContent=isPast?'📅 Past Day':'🚀 Begin Trading Day';
   }
-
   const addAssetBtn=document.getElementById('pm-add-asset-btn');
   const addNewsBtn=document.getElementById('pm-add-news-btn');
   const addGoalBtn=document.getElementById('pm-add-goal-btn');
   if(addAssetBtn) addAssetBtn.style.display=isPast?'none':'inline-flex';
   if(addNewsBtn) addNewsBtn.style.display=isPast?'none':'inline-flex';
   if(addGoalBtn) addGoalBtn.style.display=isPast?'none':'inline-flex';
-
   if(!pmData.assets||!pmData.assets.length){
     pmData.assets=settings.instruments.slice(0,3).map(s=>({symbol:s,bias:'neutral',levels:''}));
   }
@@ -1533,15 +1353,12 @@ function renderPremarket(){
   renderPmChecklist(isPast);
   renderPmTasksChecklist(isPast);
   renderPmNews(isPast);
-
   const intentionEl=document.getElementById('pm-intention');
   intentionEl.value=pmData.intention||'';
   intentionEl.disabled=isPast;
-
   const maxLossEl=document.getElementById('pm-max-loss');
   maxLossEl.value=pmData.maxloss||'';
   maxLossEl.disabled=isPast;
-
   const goalNameEl=document.getElementById('pm-goal-name');
   const goalTargetEl=document.getElementById('pm-goal-target');
   const goalUnitEl=document.getElementById('pm-goal-unit');
@@ -1549,7 +1366,6 @@ function renderPremarket(){
   if(goalTargetEl) goalTargetEl.disabled=isPast;
   if(goalUnitEl) goalUnitEl.disabled=isPast;
 }
-
 function renderPmAssets(readonly){
   const el=document.getElementById('pm-assets-list');
   el.innerHTML=(pmData.assets||[]).map((a,i)=>`
@@ -1569,7 +1385,6 @@ function renderPmAssets(readonly){
     </div>
   `).join('');
 }
-
 function renderPmChecklist(readonly){
   const settings=getSettings();
   const el=document.getElementById('pm-checklist');
@@ -1581,7 +1396,6 @@ function renderPmChecklist(readonly){
     </div>`;
   }).join('');
 }
-
 function renderPmTasksChecklist(readonly){
   const settings=getSettings();
   const el=document.getElementById('pm-tasks-checklist');
@@ -1593,7 +1407,6 @@ function renderPmTasksChecklist(readonly){
     </div>`;
   }).join('');
 }
-
 function renderPmNews(readonly){
   const el=document.getElementById('pm-news-list');
   if(!(pmData.news||[]).length){
@@ -1609,11 +1422,9 @@ function renderPmNews(readonly){
     </div>
   `).join('');
 }
-
 function setPmBias(i,bias){pmData.assets[i].bias=bias;savePremarket(pmDate,pmData);renderPmAssets(false);}
 function setPmLevels(i,val){pmData.assets[i].levels=val;savePremarket(pmDate,pmData);}
 function removePmAsset(i){pmData.assets.splice(i,1);savePremarket(pmDate,pmData);renderPmAssets(false);}
-
 function addPmAsset(){
   const sym=prompt('Enter symbol (e.g. XAUUSD):');
   if(sym&&sym.trim()){
@@ -1621,19 +1432,16 @@ function addPmAsset(){
     savePremarket(pmDate,pmData);renderPmAssets(false);
   }
 }
-
 function togglePmCheck(i){
   if(!pmData.checklist) pmData.checklist={};
   pmData.checklist[i]=!pmData.checklist[i];
   savePremarket(pmDate,pmData);renderPmChecklist(false);
 }
-
 function togglePmTask(i){
   if(!pmData.pmTasks) pmData.pmTasks={};
   pmData.pmTasks[i]=!pmData.pmTasks[i];
   savePremarket(pmDate,pmData);renderPmTasksChecklist(false);
 }
-
 function addPmNews(){
   const time=prompt('Time (e.g. 8:30 AM):');
   if(!time) return;
@@ -1644,9 +1452,7 @@ function addPmNews(){
   pmData.news.push({time:time.trim(),event:event.trim(),impact:impact.trim().toLowerCase()});
   savePremarket(pmDate,pmData);renderPmNews(false);
 }
-
 function removePmNews(i){pmData.news.splice(i,1);savePremarket(pmDate,pmData);renderPmNews(false);}
-
 function savePmField(){
   if(!pmData||pmDateOffset<0) return;
   pmData.intention=document.getElementById('pm-intention').value;
@@ -1654,24 +1460,20 @@ function savePmField(){
   savePremarket(pmDate,pmData);
   showToast();
 }
-
 function beginTradingDay(){
-  const now=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  const now=getNow().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
   pmData.started=true;pmData.startTime=now;
   savePremarket(pmDate,pmData);
   renderPremarket();
   showToast('Trading day started! 🚀');
 }
-
 let editingEntryId=null;
 let journalTrades=[];
 let journalImages=[];
-
 function renderJournalList(){
   const journal=getJournal();
   const search=(document.getElementById('journal-search')?.value||'').toLowerCase();
   const sortMode=document.getElementById('journal-sort')?.value||'latest';
-
   let entries=journal.filter(e=>{
     if(!search) return true;
     return (e.date||'').includes(search)||
@@ -1680,25 +1482,21 @@ function renderJournalList(){
       (e.what_went_wrong||'').toLowerCase().includes(search)||
       ((e.trades||[]).some(t=>(t.symbol||'').toLowerCase().includes(search)));
   });
-
   if(sortMode==='latest') entries.sort((a,b)=>b.date.localeCompare(a.date));
   else if(sortMode==='oldest') entries.sort((a,b)=>a.date.localeCompare(b.date));
   else if(sortMode==='biggest-win') entries.sort((a,b)=>parseFloat(b.net_pnl||0)-parseFloat(a.net_pnl||0));
   else if(sortMode==='biggest-loss') entries.sort((a,b)=>parseFloat(a.net_pnl||0)-parseFloat(b.net_pnl||0));
-
   const byMonth={};
   entries.forEach(e=>{
     const m=e.date.substring(0,7);
     if(!byMonth[m]) byMonth[m]=[];
     byMonth[m].push(e);
   });
-
   const el=document.getElementById('journal-list');
   if(!entries.length){
     el.innerHTML='<div class="empty"><div class="empty-icon">📓</div>No journal entries yet. Click "+ New Entry" to start logging!</div>';
     return;
   }
-
   el.innerHTML=Object.entries(byMonth).map(([month,items])=>`
     <div class="month-group">
       <div class="month-header">
@@ -1731,7 +1529,6 @@ function renderJournalList(){
     </div>
   `).join('');
 }
-
 function viewJournalEntry(id){
   const e=getJournal().find(j=>j.id===id);
   if(!e) return;
@@ -1792,12 +1589,10 @@ function viewJournalEntry(id){
     </div>
   </div>`;
 }
-
 function openLightbox(src){
   document.getElementById('lightbox-img').src=src;
   openModal('lightbox-modal');
 }
-
 function starDisplay(n){
   const rating=parseInt(n||0);
   let html='<div style="display:flex;gap:2px">';
@@ -1806,7 +1601,6 @@ function starDisplay(n){
   }
   return html+'</div>';
 }
-
 function deleteJournalEntry(id){
   if(!confirm('Delete this journal entry?')) return;
   const journal=getJournal().filter(j=>j.id!==id);
@@ -1815,7 +1609,6 @@ function deleteJournalEntry(id){
   renderJournalList();
   showToast('Entry deleted');
 }
-
 function openJournalModal(editId=null){
   editingEntryId=editId;
   const entry=editId?getJournal().find(j=>j.id===editId):null;
@@ -1826,7 +1619,6 @@ function openJournalModal(editId=null){
   renderJournalForm(entry||{});
   openModal('journal-modal');
 }
-
 function renderJournalForm(e){
   const settings=getSettings();
   const moodEmojis=['😐','🔥','😤','😰','🎯','😊','😓','🤔','💪','😤'];
@@ -1902,10 +1694,8 @@ function renderJournalForm(e){
   renderImageThumbs();
   const sl=document.getElementById('jf-emotion');
   if(sl) sl.style.setProperty('--pct',((sl.value-1)/9*100)+'%');
-
   document.addEventListener('paste',handlePaste);
 }
-
 function renderImageThumbs(){
   const el=document.getElementById('jf-image-thumbs');
   if(!el) return;
@@ -1916,31 +1706,21 @@ function renderImageThumbs(){
       <button class="img-remove" onclick="removeJournalImage(${i})">✕</button>
     </div>`).join('');
 }
-
-function removeJournalImage(i){
-  journalImages.splice(i,1);
-  renderImageThumbs();
-}
-
+function removeJournalImage(i){journalImages.splice(i,1);renderImageThumbs();}
 function handleImageFiles(event){
   const files=Array.from(event.target.files);
   files.forEach(file=>{
     if(!file.type.startsWith('image/')) return;
     const reader=new FileReader();
-    reader.onload=ev=>{
-      journalImages.push(ev.target.result);
-      renderImageThumbs();
-    };
+    reader.onload=ev=>{journalImages.push(ev.target.result);renderImageThumbs();};
     reader.readAsDataURL(file);
   });
   event.target.value='';
 }
-
 function handleDragOver(event){
   event.preventDefault();
   event.currentTarget.classList.add('dragover');
 }
-
 function handleDrop(event){
   event.preventDefault();
   event.currentTarget.classList.remove('dragover');
@@ -1951,7 +1731,6 @@ function handleDrop(event){
     reader.readAsDataURL(file);
   });
 }
-
 function handlePaste(event){
   const modal=document.getElementById('journal-modal');
   if(!modal||!modal.classList.contains('open')) return;
@@ -1965,7 +1744,6 @@ function handlePaste(event){
     }
   });
 }
-
 function renderJournalTradeRows(){
   const el=document.getElementById('jf-trades-list');
   if(!el) return;
@@ -1978,7 +1756,6 @@ function renderJournalTradeRows(){
     <option value="Liquidity Sweep">Liquidity Sweep</option>
     <option value="Displacement">Displacement</option>
     <option value="Breaker Block">Breaker Block</option>`;
-
   el.innerHTML=journalTrades.map((t,i)=>`
     <div style="display:grid;grid-template-columns:1fr 80px 90px 90px 70px 90px 130px 36px;gap:6px;margin-bottom:6px;align-items:center;min-width:0">
       <select class="form-select" style="font-size:12px;padding:8px 6px" onchange="updateTrade(${i},'symbol',this.value)">
@@ -1999,14 +1776,12 @@ function renderJournalTradeRows(){
     </div>
   `).join('');
 }
-
 function updateTrade(i,field,val){if(journalTrades[i])journalTrades[i][field]=val;}
 function addJournalTrade(){
   journalTrades.push({symbol:getSettings().instruments[0]||'XAUUSD',direction:'long',entry:'',exit:'',size:'',pnl:'',setup:''});
   renderJournalTradeRows();
 }
 function removeTrade(i){journalTrades.splice(i,1);renderJournalTradeRows();}
-
 function setStars(type,n){
   const hiddenId=type==='exec'?'jf-exec':'jf-session-r';
   const starsId=type==='exec'?'exec-stars':'session-stars';
@@ -2016,7 +1791,6 @@ function setStars(type,n){
     s.textContent=i<n?'★':'☆';
   });
 }
-
 function updateSlider(el){
   const pct=((el.value-1)/9*100);
   el.style.setProperty('--pct',pct+'%');
@@ -2025,13 +1799,11 @@ function updateSlider(el){
   const wrLbl=document.getElementById('wr-disc-lbl');
   if(wrLbl&&el.id==='wr-discipline') wrLbl.textContent=el.value+'/10';
 }
-
 function selectMood(m,btn){
   document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));
   btn.classList.add('selected');
   document.getElementById('jf-mood').value=m;
 }
-
 function saveJournalEntry(){
   const dateVal=document.getElementById('jf-date').value;
   if(!dateVal){alert('Please select a date.');return;}
@@ -2040,7 +1812,9 @@ function saveJournalEntry(){
   const netField=document.getElementById('jf-net').value;
   const netFromTrades=journalTrades.reduce((a,t)=>a+parseFloat(t.pnl||0),0);
   const net=netField!==''?parseFloat(netField):netFromTrades;
-
+  const s=getSettings();
+  const accounts=getAccounts();
+  const activeAcct=accounts[s.activeAccount||0];
   const entry={
     id,
     date:dateVal,
@@ -2058,7 +1832,8 @@ function saveJournalEntry(){
     session_rating:parseInt(document.getElementById('jf-session-r').value)||0,
     emotional_state:parseInt(document.getElementById('jf-emotion').value)||5,
     mood:document.getElementById('jf-mood').value||'😐',
-    tags:document.getElementById('jf-tags').value.split(',').map(t=>t.trim()).filter(Boolean)
+    tags:document.getElementById('jf-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    accountId:activeAcct?activeAcct.name:''
   };
   const journal=getJournal();
   const idx=journal.findIndex(j=>j.id===id);
@@ -2070,7 +1845,6 @@ function saveJournalEntry(){
   viewJournalEntry(id);
   showToast('Entry saved!');
 }
-
 function renderReflective(){
   const journal=getJournal().sort((a,b)=>b.date.localeCompare(a.date));
   const last3=journal.slice(0,3);
@@ -2092,19 +1866,15 @@ function renderReflective(){
         </div>`;
       }).join('')+'</div>';
   }
-
   const pat=load('tv_patterns');
   if(pat) document.getElementById('patterns-text').value=pat;
-
   renderWeeklyReview();
   renderMilestonesSection();
 }
-
 function savePatterns(){
   save('tv_patterns',document.getElementById('patterns-text').value);
   showToast();
 }
-
 function renderWeeklyReview(){
   const wr=load('tv_weekly_review')||{};
   const el=document.getElementById('weekly-review-form');
@@ -2124,7 +1894,6 @@ function renderWeeklyReview(){
   const s=document.getElementById('wr-discipline');
   if(s) s.style.setProperty('--pct',((disc-1)/9*100)+'%');
 }
-
 function saveWeeklyReview(){
   const wr={
     mistake:document.getElementById('wr-mistake')?.value||'',
@@ -2135,7 +1904,6 @@ function saveWeeklyReview(){
   save('tv_weekly_review',wr);
   showToast();
 }
-
 function renderMilestonesSection(){
   const s=calcStats();
   const milestones=[
@@ -2158,7 +1926,6 @@ function renderMilestonesSection(){
     </div>`;
   }).join('');
 }
-
 function showRandomEntry(){
   const journal=getJournal();
   if(!journal.length){showToast('No entries yet!');return;}
@@ -2166,28 +1933,23 @@ function showRandomEntry(){
   navigate('journal',document.querySelector('[onclick*=journal]'));
   setTimeout(()=>viewJournalEntry(e.id),100);
 }
-
 let studyFilter='All';
-
 function renderStudyCards(){
   const cards=getStudy();
   const search=(document.getElementById('study-search')?.value||'').toLowerCase();
   const cats=['All',...new Set(cards.map(c=>c.category))];
-
   const filterEl=document.getElementById('study-filter-row');
   if(filterEl) filterEl.innerHTML=cats.map(c=>`
     <button class="btn btn-sm ${studyFilter===c?'btn-gold':'btn-outline'}" onclick="setStudyFilter('${c}')">${c}</button>
   `).join('');
-
   const filtered=cards.filter(c=>{
     if(search&&!c.title.toLowerCase().includes(search)&&!(c.desc||'').toLowerCase().includes(search)&&!(c.category||'').toLowerCase().includes(search)) return false;
     if(studyFilter!=='All'&&c.category!==studyFilter) return false;
     return true;
   });
-
   const el=document.getElementById('study-cards');
   if(!filtered.length){
-    el.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📚</div>No lessons found</div>';
+    el.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📚</div>No lessons yet. Click "+ Add Lesson" to create your first one!</div>';
     return;
   }
   el.innerHTML=filtered.map(c=>`
@@ -2210,19 +1972,15 @@ function renderStudyCards(){
     </div>
   `).join('');
 }
-
 function setStudyFilter(cat){studyFilter=cat;renderStudyCards();}
-
 function openStudyViewModal(id){
   const cards=getStudy();
   const c=cards.find(x=>x.id===id);
   if(!c) return;
   document.getElementById('study-view-title').textContent=c.title;
   document.getElementById('study-edit-btn').setAttribute('onclick',`closeModal('study-view-modal');openStudyEditModal('${id}')`);
-
   const rulesLines=(c.rules||'').split('\n').filter(r=>r.trim());
   const keyPointLines=(c.keyPoints||'').split('\n').filter(k=>k.trim());
-
   let ytEmbed='';
   if(c.youtubeUrl&&c.youtubeUrl.trim()){
     const ytId=extractYouTubeId(c.youtubeUrl);
@@ -2240,7 +1998,6 @@ function openStudyViewModal(id){
       </div>`;
     }
   }
-
   const imagesHtml=(c.images&&c.images.length>0)?`
     <div class="study-section">
       <div class="study-section-title">🖼 Images & Charts</div>
@@ -2248,7 +2005,11 @@ function openStudyViewModal(id){
         ${c.images.map(img=>`<div class="study-img-thumb" onclick="openLightbox('${img}')"><img src="${img}" alt="Chart"></div>`).join('')}
       </div>
     </div>`:'';
-
+  const fullLessonHtml=c.fullLesson?`
+    <div class="study-section">
+      <div class="study-section-title">📖 Full Lesson</div>
+      <div class="study-section-body" style="white-space:pre-wrap;max-height:400px;overflow-y:auto;line-height:1.8">${escHtml(c.fullLesson)}</div>
+    </div>`:'';
   document.getElementById('study-view-body').innerHTML=`
     <div class="study-hero">
       ${(c.images&&c.images.length)?`<img src="${c.images[0]}" alt="${escAttr(c.title)}">`:`<span style="position:relative;z-index:1;font-size:64px">${c.coverEmoji||'📊'}</span>`}
@@ -2260,9 +2021,10 @@ function openStudyViewModal(id){
       <span style="margin-left:auto;font-size:12px;color:var(--secondary)">Added ${c.dateAdded||'unknown'}</span>
     </div>
     <div class="study-section">
-      <div class="study-section-title">📖 What Is It?</div>
+      <div class="study-section-title">📄 Overview</div>
       <div class="study-section-body">${escHtml(c.desc||'No description yet.')}</div>
     </div>
+    ${fullLessonHtml}
     ${rulesLines.length?`
     <div class="study-section">
       <div class="study-section-title">📋 Rules & Criteria</div>
@@ -2284,7 +2046,7 @@ function openStudyViewModal(id){
     ${c.notes?`
     <div class="study-section">
       <div class="study-section-title">📝 My Notes</div>
-      <div class="study-section-body">${escHtml(c.notes)}</div>
+      <div class="study-section-body" style="white-space:pre-wrap">${escHtml(c.notes)}</div>
     </div>`:''}
     ${imagesHtml}
     ${ytEmbed}
@@ -2298,36 +2060,29 @@ function openStudyViewModal(id){
   `;
   openModal('study-view-modal');
 }
-
 function extractYouTubeId(url){
   if(!url) return null;
   const patterns=[
     /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
     /youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]{11})/
   ];
-  for(const p of patterns){
-    const m=url.match(p);
-    if(m) return m[1];
-  }
+  for(const p of patterns){const m=url.match(p);if(m) return m[1];}
   return null;
 }
-
 let studyEditImages=[];
-
 function openStudyEditModal(id=null){
   const cards=getStudy();
   const c=id?cards.find(x=>x.id===id):null;
   studyEditImages=c?JSON.parse(JSON.stringify(c.images||[])):[];
   document.getElementById('study-edit-modal-title').textContent=c?'Edit Lesson':'Add New Lesson';
-
   document.getElementById('study-edit-modal-body').innerHTML=`
-    <div class="form-row cols-2" style="margin-bottom:0">
-      <div class="form-group"><label class="form-label">Lesson Title</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:0">
+      <div class="form-group"><label class="form-label">Lesson Title *</label>
         <input type="text" class="form-input" id="se-title" placeholder="e.g. Fair Value Gap (FVG)" value="${escAttr(c?c.title:'')}"></div>
       <div class="form-group"><label class="form-label">Category</label>
         <input type="text" class="form-input" id="se-cat" placeholder="ICT, SMC, Risk Management..." value="${escAttr(c?c.category:'')}"></div>
     </div>
-    <div class="form-row cols-2" style="margin-bottom:0">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:0">
       <div class="form-group"><label class="form-label">Difficulty</label>
         <select class="form-select" id="se-diff">
           ${['beginner','intermediate','advanced'].map(d=>`<option ${c&&c.difficulty===d?'selected':''}>${d}</option>`).join('')}
@@ -2335,22 +2090,26 @@ function openStudyEditModal(id=null){
       <div class="form-group"><label class="form-label">Cover Emoji</label>
         <input type="text" class="form-input" id="se-emoji" placeholder="📊" value="${escAttr(c?c.coverEmoji||'📊':'📊')}" maxlength="4"></div>
     </div>
-    <div class="form-group"><label class="form-label">What Is It? (Description)</label>
-      <textarea class="form-textarea" id="se-desc" style="min-height:80px" placeholder="Explain what this concept is in plain terms...">${c?escHtml(c.desc):''}</textarea></div>
+    <div class="form-group"><label class="form-label">Short Description</label>
+      <textarea class="form-textarea" id="se-desc" style="min-height:70px" placeholder="Brief overview of this concept...">${c?escHtml(c.desc):''}</textarea></div>
+    <div class="form-group"><label class="form-label">Full Lesson / Detailed Notes</label>
+      <textarea class="form-textarea" id="se-full-lesson" style="min-height:200px;line-height:1.7;font-size:13px" placeholder="Write a detailed explanation here. This is your main lesson content — go as deep as you want. Include context, examples, how to apply it in real trades, market conditions, common mistakes, etc.
+
+You can write multiple paragraphs, use bullet points, or structure it however you want.">${c?escHtml(c.fullLesson||''):''}</textarea></div>
     <div class="form-group"><label class="form-label">Entry Rules / Criteria (one per line)</label>
-      <textarea class="form-textarea" id="se-rules" style="min-height:100px" placeholder="1. Step one&#10;2. Step two&#10;3. Step three">${c?escHtml(c.rules):''}</textarea></div>
+      <textarea class="form-textarea" id="se-rules" style="min-height:80px" placeholder="1. Step one&#10;2. Step two&#10;3. Step three">${c?escHtml(c.rules):''}</textarea></div>
     <div class="form-group"><label class="form-label">Key Points (one per line)</label>
-      <textarea class="form-textarea" id="se-keypoints" style="min-height:80px" placeholder="Works on all timeframes&#10;Look for displacement first">${c?escHtml(c.keyPoints||''):''}</textarea></div>
-    <div class="form-group"><label class="form-label">My Notes / Observations</label>
-      <textarea class="form-textarea" id="se-notes" placeholder="Personal notes, things you noticed...">${c?escHtml(c.notes):''}</textarea></div>
-    <div class="form-group"><label class="form-label">YouTube Video URL (optional)</label>
+      <textarea class="form-textarea" id="se-keypoints" style="min-height:70px" placeholder="Works on all timeframes&#10;Look for displacement first">${c?escHtml(c.keyPoints||''):''}</textarea></div>
+    <div class="form-group"><label class="form-label">Personal Notes / Observations</label>
+      <textarea class="form-textarea" id="se-notes" style="min-height:80px" placeholder="Personal notes, things you noticed in live trading...">${c?escHtml(c.notes):''}</textarea></div>
+    <div class="form-group"><label class="form-label">YouTube / Reference URL (optional)</label>
       <input type="url" class="form-input" id="se-yt" placeholder="https://www.youtube.com/watch?v=..." value="${escAttr(c?c.youtubeUrl||'':'')}"></div>
     <div class="form-group"><label class="form-label">Images / Charts (optional)</label>
       <div id="se-image-thumbs" class="study-images-grid" style="margin-bottom:8px"></div>
       <div class="image-upload-area" onclick="document.getElementById('se-img-input').click()" ondragover="handleDragOver(event)" ondrop="handleStudyDrop(event)">
         <div style="font-size:24px;margin-bottom:6px">🖼</div>
         <div style="font-size:13px;color:var(--secondary)">Click to upload chart images</div>
-        <div style="font-size:11px;color:var(--secondary);margin-top:4px">PNG, JPG supported</div>
+        <div style="font-size:11px;color:var(--secondary);margin-top:4px">PNG, JPG supported · Drag & drop works</div>
         <input type="file" id="se-img-input" accept="image/*" multiple style="display:none" onchange="handleStudyImageFiles(event)">
       </div>
     </div>
@@ -2369,7 +2128,6 @@ function openStudyEditModal(id=null){
   renderStudyEditThumbs();
   openModal('study-edit-modal');
 }
-
 function renderStudyEditThumbs(){
   const el=document.getElementById('se-image-thumbs');
   if(!el) return;
@@ -2380,12 +2138,7 @@ function renderStudyEditThumbs(){
       <button class="study-img-remove" onclick="removeStudyEditImage(${i})">✕</button>
     </div>`).join('');
 }
-
-function removeStudyEditImage(i){
-  studyEditImages.splice(i,1);
-  renderStudyEditThumbs();
-}
-
+function removeStudyEditImage(i){studyEditImages.splice(i,1);renderStudyEditThumbs();}
 function handleStudyImageFiles(event){
   const files=Array.from(event.target.files);
   files.forEach(file=>{
@@ -2396,7 +2149,6 @@ function handleStudyImageFiles(event){
   });
   event.target.value='';
 }
-
 function handleStudyDrop(event){
   event.preventDefault();
   event.currentTarget.classList.remove('dragover');
@@ -2407,14 +2159,12 @@ function handleStudyDrop(event){
     reader.readAsDataURL(file);
   });
 }
-
 function toggleStudyMasteredEdit(){
   const t=document.getElementById('se-mastered-toggle');
   const h=document.getElementById('se-mastered');
   t.classList.toggle('on');
   h.value=t.classList.contains('on')?'1':'0';
 }
-
 function saveStudyCard(){
   const title=document.getElementById('se-title').value.trim();
   if(!title){alert('Please enter a title.');return;}
@@ -2427,6 +2177,7 @@ function saveStudyCard(){
     difficulty:document.getElementById('se-diff').value,
     coverEmoji:document.getElementById('se-emoji').value.trim()||'📊',
     desc:document.getElementById('se-desc').value,
+    fullLesson:document.getElementById('se-full-lesson').value,
     rules:document.getElementById('se-rules').value,
     keyPoints:document.getElementById('se-keypoints').value,
     notes:document.getElementById('se-notes').value,
@@ -2442,7 +2193,6 @@ function saveStudyCard(){
   renderStudyCards();
   showToast('Lesson saved!');
 }
-
 function deleteStudyCard(id){
   if(!confirm('Delete this lesson?')) return;
   save(KEYS.study,getStudy().filter(c=>c.id!==id));
@@ -2451,7 +2201,6 @@ function deleteStudyCard(id){
   renderStudyCards();
   showToast('Deleted');
 }
-
 function renderPlaybook(){
   const pb=getPlaybook();
   const active=pb.filter(p=>p.status==='active').length;
@@ -2484,7 +2233,6 @@ function renderPlaybook(){
     </div>
   `).join('');
 }
-
 function openPlaybookModal(id=null){
   const pb=getPlaybook();
   const p=id?pb.find(x=>x.id===id):null;
@@ -2529,7 +2277,6 @@ function openPlaybookModal(id=null){
   `;
   openModal('playbook-modal');
 }
-
 function savePlaybook(){
   const name=document.getElementById('pb-name').value.trim();
   if(!name){alert('Please enter a setup name.');return;}
@@ -2555,20 +2302,17 @@ function savePlaybook(){
   renderPlaybook();
   showToast();
 }
-
 function deletePlaybook(id){
   if(!confirm('Delete this setup?')) return;
   save(KEYS.playbook,getPlaybook().filter(p=>p.id!==id));
   closeModal('playbook-modal');
   renderPlaybook();
 }
-
 function renderGoals(){
   const allGoals=getGoals();
   const activeGoals=allGoals.filter(g=>g.tab===currentGoalTab&&!g.completed);
   const completedGoals=allGoals.filter(g=>g.tab===currentGoalTab&&g.completed);
   const el=document.getElementById('goals-list');
-
   if(!activeGoals.length){
     el.innerHTML='<div class="empty"><div class="empty-icon">🏆</div>No active goals for this period. Add one above!</div>';
   } else {
@@ -2591,7 +2335,6 @@ function renderGoals(){
       </div>`;
     }).join('');
   }
-
   const prevEl=document.getElementById('goals-prev-section');
   if(completedGoals.length){
     prevEl.innerHTML=`
@@ -2612,41 +2355,33 @@ function renderGoals(){
   } else {
     prevEl.innerHTML='';
   }
-
   if(currentGoalTab==='daily') renderGoalAccountability();
   else document.getElementById('goals-accountability').innerHTML='';
 }
-
 function markGoalCompleted(id){
   const goals=getGoals();
   const g=goals.find(x=>x.id===id);
   if(!g) return;
-  g.completed=true;
-  g.completedDate=today();
-  save(KEYS.goals,goals);
-  renderGoals();
+  g.completed=true;g.completedDate=today();
+  save(KEYS.goals,goals);renderGoals();
   if(currentPage==='dashboard') renderDashGoals();
   showToast('Goal marked as completed! 🎉');
 }
-
 function unmarkGoalCompleted(id){
   const goals=getGoals();
   const g=goals.find(x=>x.id===id);
   if(!g) return;
-  g.completed=false;
-  g.completedDate=null;
-  save(KEYS.goals,goals);
-  renderGoals();
+  g.completed=false;g.completedDate=null;
+  save(KEYS.goals,goals);renderGoals();
   if(currentPage==='dashboard') renderDashGoals();
   showToast('Goal moved back to active');
 }
-
 function renderGoalAccountability(){
   const days=thisMonthDays();
   const journal=getJournal();
   const el=document.getElementById('goals-accountability');
   el.innerHTML=`<div class="card" style="margin-top:16px">
-    <div class="card-title">Daily Hit/Miss Calendar — ${new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'})}</div>
+    <div class="card-title">Daily Hit/Miss Calendar — ${getNow().toLocaleDateString('en-US',{month:'long',year:'numeric'})}</div>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
       ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div style="text-align:center;font-size:10px;color:var(--secondary);padding:2px">${d}</div>`).join('')}
       ${(()=>{
@@ -2669,7 +2404,7 @@ function renderGoalAccountability(){
     </div>
   </div>`;
 }
-
+let currentGoalTab='daily';
 function switchGoalTab(tab,el){
   currentGoalTab=tab;
   document.querySelectorAll('#goals-tabs .tab').forEach(t=>t.classList.remove('active'));
@@ -2678,7 +2413,6 @@ function switchGoalTab(tab,el){
   document.getElementById('goals-tab-title').textContent=titles[tab];
   renderGoals();
 }
-
 function openGoalModal(){
   document.getElementById('goal-modal-body').innerHTML=`
     <div class="form-group"><label class="form-label">Goal Name</label>
@@ -2702,29 +2436,22 @@ function openGoalModal(){
   `;
   openModal('goal-modal');
 }
-
 function saveGoal(){
   const name=document.getElementById('gm-name').value.trim();
   if(!name){alert('Please enter a goal name.');return;}
   const goals=getGoals();
   goals.push({
-    id:'g'+Date.now(),
-    tab:currentGoalTab,
-    name,
+    id:'g'+Date.now(),tab:currentGoalTab,name,
     target:parseFloat(document.getElementById('gm-target').value)||100,
     unit:document.getElementById('gm-unit').value||'',
     deadline:document.getElementById('gm-deadline').value||'',
     notes:document.getElementById('gm-gnotes').value||'',
     current:parseFloat(document.getElementById('gm-current').value)||0,
-    completed:false,
-    completedDate:null
+    completed:false,completedDate:null
   });
   save(KEYS.goals,goals);
-  closeModal('goal-modal');
-  renderGoals();
-  showToast();
+  closeModal('goal-modal');renderGoals();showToast();
 }
-
 function updateGoalProgress(id){
   const goals=getGoals();
   const g=goals.find(x=>x.id===id);
@@ -2734,105 +2461,113 @@ function updateGoalProgress(id){
   const num=parseFloat(val);
   if(isNaN(num)){alert('Please enter a valid number.');return;}
   g.current=num;
-  save(KEYS.goals,goals);
-  renderGoals();
+  save(KEYS.goals,goals);renderGoals();
   showToast(num>=g.target?'🎉 Goal achieved!':'Progress updated!');
 }
-
 function deleteGoal(id){
   if(!confirm('Delete this goal?')) return;
-  save(KEYS.goals,getGoals().filter(g=>g.id!==id));
-  renderGoals();
+  save(KEYS.goals,getGoals().filter(g=>g.id!==id));renderGoals();
 }
-
 function renderSettings(){
   const settings=getSettings();
   document.getElementById('s-name').value=settings.name||'';
   document.getElementById('s-alias').value=settings.alias||'';
-  document.getElementById('s-risk').value=settings.risk||'';
-  document.getElementById('s-maxloss').value=settings.maxloss||'';
-  document.getElementById('s-maxtrades').value=settings.maxtrades||'';
-  renderInstruments();
+  const tzEl=document.getElementById('s-timezone');
+  if(tzEl) tzEl.value=settings.timezone||'America/Los_Angeles';
   renderAccounts();
-  renderChecklistMgr();
-  renderPmTasksMgr();
   updateAccountBadge();
 }
-
 function saveSettings(){
   const s=getSettings();
   s.name=document.getElementById('s-name').value;
   s.alias=document.getElementById('s-alias').value;
-  s.risk=parseFloat(document.getElementById('s-risk').value)||1;
-  s.maxloss=parseFloat(document.getElementById('s-maxloss').value)||250;
-  s.maxtrades=parseInt(document.getElementById('s-maxtrades').value)||3;
+  const tzEl=document.getElementById('s-timezone');
+  if(tzEl) s.timezone=tzEl.value;
   save(KEYS.settings,s);
   showToast();
 }
-
+function updateTopbarDate(){
+  const s=getSettings();
+  const tz=s.timezone||'America/Los_Angeles';
+  const now=new Date();
+  const str=now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric',timeZone:tz});
+  const tzShort=now.toLocaleTimeString('en-US',{timeZoneName:'short',timeZone:tz}).split(' ').pop();
+  document.getElementById('topbar-date').textContent=`${str} · ${tzShort}`;
+}
 function updateAccountBadge(){
   const accounts=getAccounts();
   const s=getSettings();
-  const active=accounts[s.activeAccount||0];
-  if(active) document.getElementById('account-badge').textContent=active.name;
+  const idx=s.activeAccount;
+  let name;
+  if(idx===-1){name='All Accounts';}
+  else{const active=accounts[idx];name=active?active.name:'No Account';}
+  document.getElementById('account-badge-text').textContent=name;
+  renderAccountDropdown();
 }
-
-function renderInstruments(){
-  const s=getSettings();
-  document.getElementById('instruments-list').innerHTML=s.instruments.map((inst,i)=>`
-    <div style="display:flex;align-items:center;gap:4px;background:var(--elevated);border:1px solid var(--border);border-radius:6px;padding:4px 8px">
-      <span style="font-family:'JetBrains Mono',monospace;font-size:12px">${inst}</span>
-      <span onclick="removeInstrument(${i})" style="cursor:pointer;color:var(--secondary);font-size:12px;margin-left:4px;user-select:none" title="Remove">✕</span>
-    </div>
-  `).join('');
-}
-
-function addInstrument(){
-  const val=document.getElementById('new-instrument').value.trim().toUpperCase();
-  if(!val) return;
-  const s=getSettings();
-  if(!s.instruments.includes(val)){s.instruments.push(val);save(KEYS.settings,s);}
-  document.getElementById('new-instrument').value='';
-  renderInstruments();
-  showToast();
-}
-
-function removeInstrument(i){
-  const s=getSettings();
-  s.instruments.splice(i,1);
-  save(KEYS.settings,s);
-  renderInstruments();
-}
-
-function renderAccounts(){
+function renderAccountDropdown(){
   const accounts=getAccounts();
   const s=getSettings();
-  const activeIdx=s.activeAccount||0;
-  document.getElementById('accounts-list').innerHTML=accounts.map((a,i)=>`
-    <div class="acc-item">
+  const activeIdx=s.activeAccount;
+  const allItem=`<div class="account-dropdown-item ${activeIdx===-1?'active':''}" onclick="setActiveAccount(-1)">
+    <div>
+      <div style="font-weight:600;font-size:13px">All Accounts</div>
+      <div style="font-size:11px;color:var(--secondary)">Combined view of all data</div>
+    </div>
+    ${activeIdx===-1?'<div class="acc-dot"></div>':''}
+  </div>`;
+  const items=accounts.map((a,i)=>`
+    <div class="account-dropdown-item ${activeIdx===i?'active':''}" onclick="setActiveAccount(${i})">
       <div>
-        <div style="font-size:13px;font-weight:600">${a.name}</div>
-        <div style="font-size:11px;color:var(--secondary)">${a.broker||'—'} · ${a.type} · $${(a.balance||0).toLocaleString()}</div>
+        <div style="font-weight:600;font-size:13px">${a.name}</div>
+        <div style="font-size:11px;color:var(--secondary)">${a.broker||'—'} · ${a.type}</div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        ${activeIdx===i
-          ?'<div class="acc-active-dot" title="Active"></div>'
-          :`<button class="btn btn-outline btn-sm" style="font-size:11px" onclick="setActiveAccount(${i})">Set Active</button>
-            <button class="btn btn-outline btn-sm" style="font-size:11px;color:var(--red);border-color:rgba(231,76,60,0.3)" onclick="removeAccount(${i})">✕</button>`}
-      </div>
+      ${activeIdx===i?'<div class="acc-dot"></div>':''}
     </div>
   `).join('');
+  document.getElementById('account-dropdown').innerHTML=allItem+items;
 }
-
+function toggleAccountDropdown(){
+  const dd=document.getElementById('account-dropdown');
+  dd.classList.toggle('open');
+}
 function setActiveAccount(i){
   const s=getSettings();
   s.activeAccount=i;
   save(KEYS.settings,s);
+  document.getElementById('account-dropdown').classList.remove('open');
   updateAccountBadge();
-  renderAccounts();
-  showToast('Account switched!');
+  if(currentPage==='settings') renderAccounts();
+  if(currentPage==='dashboard') renderDashboard();
+  showToast(i===-1?'Viewing all accounts':'Account switched!');
 }
-
+function renderAccounts(){
+  const accounts=getAccounts();
+  const s=getSettings();
+  const activeIdx=s.activeAccount;
+  document.getElementById('accounts-list').innerHTML=accounts.map((a,i)=>{
+    const isActive=activeIdx===i;
+    const journal=getJournal();
+    const accEntries=journal.filter(e=>e.accountId===a.name||(i===0&&!e.accountId));
+    const totalPnl=accEntries.reduce((sum,e)=>sum+parseFloat(e.net_pnl||0),0);
+    const tradeDays=new Set(accEntries.map(e=>e.date)).size;
+    return `<div class="acc-item ${isActive?'active-acc':''}">
+      <div class="acc-item-top">
+        <div class="acc-item-name">${a.name} ${isActive?'<span style="font-size:11px;color:var(--gold)">● Active</span>':''}</div>
+        <div style="display:flex;gap:6px">
+          ${!isActive?`<button class="btn btn-outline btn-sm" style="font-size:11px" onclick="setActiveAccount(${i})">Set Active</button>`:''}
+          <button class="btn btn-outline btn-sm" style="font-size:11px;color:var(--red);border-color:rgba(231,76,60,0.3)" onclick="removeAccount(${i})">✕</button>
+        </div>
+      </div>
+      <div class="acc-item-meta">
+        <span class="acc-meta-pill">${a.broker||'—'}</span>
+        <span class="acc-meta-pill">${a.type}</span>
+        <span class="acc-meta-pill">$${(a.balance||0).toLocaleString()} start</span>
+        <span class="acc-meta-pill" style="color:${totalPnl>=0?'var(--green)':'var(--red)'}">${fmtMoney(totalPnl)} PnL</span>
+        <span class="acc-meta-pill">${tradeDays} trade days</span>
+      </div>
+    </div>`;
+  }).join('');
+}
 function removeAccount(i){
   if(!confirm('Remove this account?')) return;
   const accounts=getAccounts();
@@ -2844,7 +2579,6 @@ function removeAccount(i){
   updateAccountBadge();
   renderAccounts();
 }
-
 function openAccountModal(){
   document.getElementById('account-modal-body').innerHTML=`
     <div class="form-group"><label class="form-label">Account Name</label>
@@ -2866,7 +2600,6 @@ function openAccountModal(){
   `;
   openModal('account-modal');
 }
-
 function saveAccount(){
   const name=document.getElementById('am-name').value.trim();
   if(!name){alert('Please enter an account name.');return;}
@@ -2880,68 +2613,9 @@ function saveAccount(){
   save(KEYS.accounts,accounts);
   closeModal('account-modal');
   renderAccounts();
+  renderAccountDropdown();
   showToast('Account added!');
 }
-
-function renderChecklistMgr(){
-  const s=getSettings();
-  document.getElementById('checklist-items-mgr').innerHTML=s.checklist.map((item,i)=>`
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
-      <span style="font-size:13px">${item}</span>
-      <button class="btn btn-outline btn-sm" style="font-size:11px;padding:3px 7px;color:var(--red);border-color:rgba(231,76,60,0.3)" onclick="removeChecklistItemSetting(${i})">✕</button>
-    </div>
-  `).join('')||'<div style="font-size:12px;color:var(--secondary);padding:8px 0">No items. Add some below.</div>';
-}
-
-function renderPmTasksMgr(){
-  const s=getSettings();
-  const el=document.getElementById('pm-tasks-mgr');
-  if(!el) return;
-  el.innerHTML=(s.pmTasks||[]).map((item,i)=>`
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
-      <span style="font-size:13px">${item}</span>
-      <button class="btn btn-outline btn-sm" style="font-size:11px;padding:3px 7px;color:var(--red);border-color:rgba(231,76,60,0.3)" onclick="removePmTaskItem(${i})">✕</button>
-    </div>
-  `).join('')||'<div style="font-size:12px;color:var(--secondary);padding:8px 0">No items. Add some below.</div>';
-}
-
-function addChecklistItem(){
-  const val=document.getElementById('new-checklist-item').value.trim();
-  if(!val) return;
-  const s=getSettings();
-  s.checklist.push(val);
-  save(KEYS.settings,s);
-  document.getElementById('new-checklist-item').value='';
-  renderChecklistMgr();
-  showToast();
-}
-
-function removeChecklistItemSetting(i){
-  const s=getSettings();
-  s.checklist.splice(i,1);
-  save(KEYS.settings,s);
-  renderChecklistMgr();
-}
-
-function addPmTaskItem(){
-  const val=document.getElementById('new-pm-task').value.trim();
-  if(!val) return;
-  const s=getSettings();
-  if(!s.pmTasks) s.pmTasks=[];
-  s.pmTasks.push(val);
-  save(KEYS.settings,s);
-  document.getElementById('new-pm-task').value='';
-  renderPmTasksMgr();
-  showToast();
-}
-
-function removePmTaskItem(i){
-  const s=getSettings();
-  s.pmTasks.splice(i,1);
-  save(KEYS.settings,s);
-  renderPmTasksMgr();
-}
-
 function exportData(){
   const data={};
   Object.values(KEYS).forEach(k=>{const v=load(k);if(v!==null)data[k]=v;});
@@ -2954,7 +2628,6 @@ function exportData(){
   a.click();
   showToast('Exported!');
 }
-
 function importData(e){
   const file=e.target.files[0];
   if(!file) return;
@@ -2970,16 +2643,17 @@ function importData(e){
   reader.readAsText(file);
   e.target.value='';
 }
-
 function clearAllData(){
-  if(!confirm('⚠️ This will permanently delete ALL your journal entries, goals, playbook, and settings.\n\nThis cannot be undone!\n\nType "DELETE" to confirm, then click OK.')) return;
-  Object.values(KEYS).forEach(k=>localStorage.removeItem(k));
-  localStorage.removeItem('tv_patterns');
-  localStorage.removeItem('tv_weekly_review');
-  showToast('All data cleared');
-  setTimeout(()=>renderPage(currentPage),400);
+  exportData();
+  setTimeout(()=>{
+    if(!confirm('⚠️ A backup has been downloaded.\n\nThis will permanently delete ALL data and cannot be undone.\n\nContinue?')) return;
+    Object.values(KEYS).forEach(k=>localStorage.removeItem(k));
+    localStorage.removeItem('tv_patterns');
+    localStorage.removeItem('tv_weekly_review');
+    showToast('All data cleared');
+    setTimeout(()=>renderPage(currentPage),400);
+  },600);
 }
-
 function showDayModal(date){
   const journal=getJournal().filter(e=>e.date===date);
   const pnl=journal.reduce((a,e)=>a+parseFloat(e.net_pnl||0),0);
@@ -3021,24 +2695,20 @@ function showDayModal(date){
   `:'<div class="empty"><div class="empty-icon">📅</div>No trades logged on this day</div>';
   openModal('day-modal');
 }
-
 function fmtMoney(n){
   n=parseFloat(n)||0;
   const abs=Math.abs(n);
   const str=abs.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
   return (n<0?'- $':'+ $')+str;
 }
-
 function escHtml(str){
   if(!str) return '';
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
-
 function escAttr(str){
   if(!str) return '';
   return String(str).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
-
 function openModal(id){
   document.getElementById(id).classList.add('open');
   document.body.style.overflow='hidden';
@@ -3048,7 +2718,6 @@ function closeModal(id){
   document.body.style.overflow='';
   if(id==='journal-modal') document.removeEventListener('paste',handlePaste);
 }
-
 let toastTimer=null;
 function showToast(msg='Saved ✓'){
   const el=document.getElementById('toast');
@@ -3057,37 +2726,68 @@ function showToast(msg='Saved ✓'){
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
 }
-
+let sidebarCollapsed=false;
+function toggleSidebar(){
+  sidebarCollapsed=!sidebarCollapsed;
+  const sb=document.getElementById('sidebar');
+  if(sidebarCollapsed){
+    sb.classList.add('collapsed');
+  } else {
+    sb.classList.remove('collapsed');
+  }
+}
+let currentPage='dashboard';
+function navigate(page,el){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  const titles={dashboard:'Dashboard',premarket:'Pre-Market',journal:'Journal',reflective:'Reflective',
+    study:'Study',playbook:'Playbook',goals:'Goals',settings:'Settings'};
+  document.getElementById('topbar-title').textContent=titles[page]||page;
+  currentPage=page;
+  renderPage(page);
+  document.getElementById('account-dropdown').classList.remove('open');
+}
+function renderPage(page){
+  if(page==='dashboard') renderDashboard();
+  else if(page==='premarket') renderPremarket();
+  else if(page==='journal') renderJournalList();
+  else if(page==='reflective') renderReflective();
+  else if(page==='study') renderStudyCards();
+  else if(page==='playbook') renderPlaybook();
+  else if(page==='goals') renderGoals();
+  else if(page==='settings') renderSettings();
+}
 document.querySelectorAll('.modal-overlay').forEach(overlay=>{
   overlay.addEventListener('click',e=>{
     if(e.target===overlay) closeModal(overlay.id);
   });
 });
-
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
     const open=document.querySelector('.modal-overlay.open');
     if(open) closeModal(open.id);
   }
 });
-
+document.addEventListener('click',e=>{
+  const wrap=document.getElementById('account-dropdown-wrap');
+  if(wrap&&!wrap.contains(e.target)){
+    document.getElementById('account-dropdown').classList.remove('open');
+  }
+});
 function init(){
-  document.getElementById('topbar-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
-
-  if(!load(KEYS.study)) save(KEYS.study,defaultStudy());
-
+  updateTopbarDate();
+  setInterval(updateTopbarDate,60000);
+  const s=getSettings();
+  if(s.activeAccount===undefined) s.activeAccount=0;
+  save(KEYS.settings,s);
   updateAccountBadge();
   renderDashboard();
-
   setInterval(()=>{
     if(currentPage==='premarket'&&pmData&&pmDateOffset===0) savePmField();
   },30000);
-
-  document.getElementById('new-instrument').addEventListener('keydown',e=>{if(e.key==='Enter')addInstrument();});
-  document.getElementById('new-checklist-item').addEventListener('keydown',e=>{if(e.key==='Enter')addChecklistItem();});
-  document.getElementById('new-pm-task').addEventListener('keydown',e=>{if(e.key==='Enter')addPmTaskItem();});
 }
-
 init();
 </script>
 </body>
